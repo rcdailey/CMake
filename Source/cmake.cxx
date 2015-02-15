@@ -957,19 +957,37 @@ void cmake::AddDefaultExtraGenerators()
 
 
 //----------------------------------------------------------------------------
-void cmake::GetRegisteredGenerators(std::vector<std::string>& names)
+void cmake::GetRegisteredGenerators(std::vector<GeneratorInfo>& generators)
 {
-  for(RegisteredGeneratorsVector::const_iterator i = this->Generators.begin();
-      i != this->Generators.end(); ++i)
-    {
-    (*i)->GetGenerators(names);
-    }
-  for(RegisteredExtraGeneratorsMap::const_iterator
-      i = this->ExtraGenerators.begin();
-      i != this->ExtraGenerators.end(); ++i)
-    {
-    names.push_back(i->first);
-    }
+   {
+      RegisteredGeneratorsVector::const_iterator it, end = Generators.end();
+
+      for (it = Generators.begin(); it != end; ++it)
+      {
+         std::vector<std::string> names;
+         (*it)->GetGenerators(names);
+
+         for (std::size_t i = 0; i < names.size(); ++i)
+         {
+            GeneratorInfo info;
+            info.supportsToolset = (*it)->SupportsToolset();
+            info.name = names[i];
+            generators.push_back(info);
+         }
+      }
+   }
+
+   {
+      RegisteredExtraGeneratorsMap::const_iterator it, end = ExtraGenerators.end();
+
+      for (it = ExtraGenerators.begin(); it != end; ++it)
+      {
+         GeneratorInfo info;
+         info.supportsToolset = false;
+         info.name = it->first;
+         generators.push_back(info);
+      }
+   }
 }
 
 cmGlobalGenerator* cmake::CreateGlobalGenerator(const std::string& gname)

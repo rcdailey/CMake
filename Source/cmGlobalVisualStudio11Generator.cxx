@@ -95,7 +95,9 @@ public:
       {
       names.push_back(std::string(vs11generatorName) + " " + *i);
       }
-    }
+  }
+
+  virtual bool SupportsToolset() const { return true; }
 };
 
 //----------------------------------------------------------------------------
